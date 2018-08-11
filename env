@@ -1,0 +1,7 @@
+### PROJECT SETTINGS
+
+CLIENT_NAME=testsite
+PROJECT_NAME=my_wordpress_project
+# Used within NGINX
+NGINX_HOST=testsite.com
+NGINX_PORT=80

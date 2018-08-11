@@ -1,0 +1,127 @@
+version: "3.2"
+
+
+services:
+  nginx:
+    image: nginx:latest
+    env_file: ./env
+    # configs:
+    #   - source: site.template
+    #     target: /etc/nginx/conf.d/site.template
+    #     mode: 0440
+    volumes:
+    - ./site.template:/etc/nginx/conf.d/site.template:ro
+    - ./data/wp:/var/www/html:rw
+    - ./site_nginx.conf:/etc/nginx/nginx.conf
+    ports:
+    - "80:80"
+    command: /bin/bash -c "envsubst '$$NGINX_HOST,$$NGINX_PORT' < /etc/nginx/conf.d/site.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
+    depends_on:
+      - memcached
+      - wordpress
+    networks:
+      infra-traefik_public:
+      internal:
+    deploy:
+      labels:
+        traefik.enable: "true"
+        traefik.backend: nginx
+        traefik.frontend.rule: "Host:${NGINX_HOST},www.${NGINX_HOST}"
+        traefik.docker.network: infra-traefik_public
+        traefik.port: '80'
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  memcached:
+    image: amd64/memcached
+    labels:
+      - traefik.enable=false
+    networks:
+      internal:
+
+  wordpress:
+    image: ptsiampas/dexs-wp:4.9.8-php7.1-fpm
+    build:
+      context: builds/php7-fpm
+    secrets:
+      - source: mysql-root-pass
+      - source: wp-user
+      - source: wp-user-pass
+
+    depends_on:
+      - mysql
+    environment:
+      - MYSQL_DATABASE=wordpress
+      - WORDPRESS_DB_HOST=mysql
+      - WORDPRESS_DB_USER_FILE=/run/secrets/wp-user
+      - WORDPRESS_DB_PASSWORD_FILE=/run/secrets/wp-user-pass
+      - afinity:container==nginx
+    labels:
+      traefik.enable: "false"
+    networks:
+      internal:
+    volumes:
+      - ./data/wp:/var/www/html:rw
+
+  mysql:
+    image: mysql:5.7.21
+    secrets:
+      - mysql-root-pass
+      - wp-user
+      - wp-user-pass
+    environment:
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-root-pass
+      - MYSQL_USER_FILE=/run/secrets/wp-user
+      - MYSQL_PASSWORD_FILE=/run/secrets/wp-user-pass
+      # - MYSQL_ROOT_PASSWORD=1234
+      # - MYSQL_USER=test
+      # - MYSQL_PASSWORD=1234
+      - afinity:container!=wordpress
+    labels:
+      traefik.enable: "false"
+    networks:
+      internal:
+    volumes:
+      - ./data/db:/var/lib/mysql:rw
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+secrets:
+  # Production
+  # laserkraft-msql-root:
+  #   external: true
+  # laserkraft-wp-user:
+  #   external: true
+  # laserkraft-wp-user-pass:
+  #   external: true
+  # Development
+  mysql-root-pass:
+    file: ./data/secrets/mysql_root_password.txt
+  wp-user:
+    file: ./data/secrets/wordpress_user.txt
+  wp-user-pass:
+    file: ./data/secrets/wordpress-user-pass.txt
+
+networks:
+  infra-traefik_public:
+    external: true
+  internal:
+    driver: overlay
+    attachable: true
+
+# configs:
+#   site.template:
+#     external: true

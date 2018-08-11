@@ -1,0 +1,42 @@
+all-in-one-seo-pack
+storefront-footer-bar
+storefront-hamburger-menu
+storefront-homepage-contact-section
+storefront-product-pagination
+storefront-product-sharing
+storefront-sticky-add-to-cart
+storefront-top-bar
+
+wp theme install storefront --allow-root --activate
+wp plugin install all-in-one-seo-pack \
+storefront-footer-bar \
+storefront-powerpack \
+storefront-hamburger-menu \
+storefront-homepage-contact-section \
+storefront-product-pagination \
+storefront-product-sharing \
+storefront-sticky-add-to-cart \
+storefront-top-bar \
+mailpoet \
+wp-mail-smtp \
+--allow-root --activate
+chown -R www-data:www-data /var/www/html
+
++---------------------------------------------+--------+-----------+---------+
+| name                                        | status | update    | version |
++---------------------------------------------+--------+-----------+---------+
+| akismet                                     | active | none      | 4.0.7   |
+| all-in-one-seo-pack                         | active | none      | 2.6     |
+| mailpoet                                    | active | available | 3.7.3   |
+| storefront-hamburger-menu                   | active | none      | 1.2.2   |
+| storefront-powerpack                        | active | none      | 1.4.7   |
+| storefront-product-pagination               | active | none      | 1.2.3   |
+| storefront-sticky-add-to-cart               | active | none      | 1.1.8   |
+| woocommerce                                 | active | available | 3.4.0   |
+| woocommerce-gateway-paypal-express-checkout | active | none      | 1.5.5   |
+| woocommerce-product-addons                  | active | none      | 2.9.6   |
+| wp-ffpc                                     | active | none      | 1.11.2  |
+| wp-mail-smtp                                | active | none      | 1.2.5   |
++---------------------------------------------+--------+-----------+---------+
+
+mailhog.laserkraft.com.au
