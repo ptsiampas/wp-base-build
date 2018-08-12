@@ -22,6 +22,7 @@ echo "network: $NETWORK"
 echo "volume: $VOL_SRC:$VOL_TRG"
 
 docker run -it --rm \
+--user 33:33 \
 --volume "$VOL_SRC:$VOL_TRG" \
 --network "$NETWORK" \
 $CLI_IMAGE "$@"

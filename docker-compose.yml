@@ -1,6 +1,5 @@
 version: "3.2"
 
-
 services:
   nginx:
     image: nginx:latest
@@ -10,17 +9,17 @@ services:
     #     target: /etc/nginx/conf.d/site.template
     #     mode: 0440
     volumes:
-    - ./site.template:/etc/nginx/conf.d/site.template:ro
-    - ./data/wp:/var/www/html:rw
-    - ./site_nginx.conf:/etc/nginx/nginx.conf
-    ports:
-    - "80:80"
+    - /var/data/client-data/wordpress/testsite.com/site.template:/etc/nginx/conf.d/site.template:ro
+    - /var/data/client-data/wordpress/testsite.com/data/wp:/var/www/html:rw
+    - /var/data/client-data/wordpress/testsite.com/site_nginx.conf:/etc/nginx/nginx.conf
+    #ports:
+    #- "80:80"
     command: /bin/bash -c "envsubst '$$NGINX_HOST,$$NGINX_PORT' < /etc/nginx/conf.d/site.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
     depends_on:
       - memcached
       - wordpress
     networks:
-      infra-traefik_public:
+      public:
       internal:
     deploy:
       labels:
@@ -66,7 +65,7 @@ services:
     networks:
       internal:
     volumes:
-      - ./data/wp:/var/www/html:rw
+      - /var/data/client-data/wordpress/testsite.com/data/wp:/var/www/html:rw
 
   mysql:
     image: mysql:5.7.21
@@ -88,7 +87,7 @@ services:
     networks:
       internal:
     volumes:
-      - ./data/db:/var/lib/mysql:rw
+      - /var/data/client-data/wordpress/testsite.com/data/db:/var/lib/mysql:rw
     deploy:
       replicas: 1
       update_config:
@@ -109,14 +108,14 @@ secrets:
   #   external: true
   # Development
   mysql-root-pass:
-    file: ./data/secrets/mysql_root_password.txt
+    file: /var/data/client-data/wordpress/testsite.com/data/secrets/mysql_root_password.txt
   wp-user:
-    file: ./data/secrets/wordpress_user.txt
+    file: /var/data/client-data/wordpress/testsite.com/data/secrets/wordpress_user.txt
   wp-user-pass:
-    file: ./data/secrets/wordpress-user-pass.txt
+    file: /var/data/client-data/wordpress/testsite.com/data/secrets/wordpress-user-pass.txt
 
 networks:
-  infra-traefik_public:
+  public:
     external: true
   internal:
     driver: overlay
