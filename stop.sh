@@ -1,4 +1,4 @@
 #!/bin/bash
 # shellcheck source=/dev/null
 source "$(pwd)/env"
-docker stack rm  "wp-${CLIENT_NAME}"
+docker stack rm  "wp-${CONTAINER_NAME}"

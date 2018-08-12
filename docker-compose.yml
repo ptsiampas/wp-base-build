@@ -9,9 +9,9 @@ services:
     #     target: /etc/nginx/conf.d/site.template
     #     mode: 0440
     volumes:
-    - /var/data/client-data/wordpress/testsite.com/site.template:/etc/nginx/conf.d/site.template:ro
-    - /var/data/client-data/wordpress/testsite.com/data/wp:/var/www/html:rw
-    - /var/data/client-data/wordpress/testsite.com/site_nginx.conf:/etc/nginx/nginx.conf
+    - ./site.template:/etc/nginx/conf.d/site.template:ro
+    - ./data/wp:/var/www/html:rw
+    - ./site_nginx.conf:/etc/nginx/nginx.conf
     #ports:
     #- "80:80"
     command: /bin/bash -c "envsubst '$$NGINX_HOST,$$NGINX_PORT' < /etc/nginx/conf.d/site.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
@@ -48,24 +48,24 @@ services:
     build:
       context: builds/php7-fpm
     secrets:
-      - source: mysql-root-pass
-      - source: wp-user
-      - source: wp-user-pass
+      - source: ${CONTAINER_NAME}-mysql-root-pass
+      - source: ${CONTAINER_NAME}-wp-user
+      - source: ${CONTAINER_NAME}-wp-user-pass
 
     depends_on:
       - mysql
     environment:
       - MYSQL_DATABASE=wordpress
       - WORDPRESS_DB_HOST=mysql
-      - WORDPRESS_DB_USER_FILE=/run/secrets/wp-user
-      - WORDPRESS_DB_PASSWORD_FILE=/run/secrets/wp-user-pass
+      - WORDPRESS_DB_USER_FILE=/run/secrets/${CONTAINER_NAME}-wp-user
+      - WORDPRESS_DB_PASSWORD_FILE=/run/secrets/${CONTAINER_NAME}-wp-user-pass
       - afinity:container==nginx
     labels:
       traefik.enable: "false"
     networks:
       internal:
     volumes:
-      - /var/data/client-data/wordpress/testsite.com/data/wp:/var/www/html:rw
+      - ./data/wp:/var/www/html:rw
 
   mysql:
     image: mysql:5.7.21
@@ -75,9 +75,9 @@ services:
       - wp-user-pass
     environment:
       - MYSQL_DATABASE=wordpress
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-root-pass
-      - MYSQL_USER_FILE=/run/secrets/wp-user
-      - MYSQL_PASSWORD_FILE=/run/secrets/wp-user-pass
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/${CONTAINER_NAME}-mysql-root-pass
+      - MYSQL_USER_FILE=/run/secrets/${CONTAINER_NAME}-wp-user
+      - MYSQL_PASSWORD_FILE=/run/secrets/${CONTAINER_NAME}wp-user-pass
       # - MYSQL_ROOT_PASSWORD=1234
       # - MYSQL_USER=test
       # - MYSQL_PASSWORD=1234
@@ -87,7 +87,7 @@ services:
     networks:
       internal:
     volumes:
-      - /var/data/client-data/wordpress/testsite.com/data/db:/var/lib/mysql:rw
+      - ./data/db:/var/lib/mysql:rw
     deploy:
       replicas: 1
       update_config:
@@ -100,22 +100,22 @@ services:
 
 secrets:
   # Production
-  # laserkraft-msql-root:
+  # ${CONTAINER_NAME}-msql-root:
   #   external: true
-  # laserkraft-wp-user:
+  # ${CONTAINER_NAME}-wp-user:
   #   external: true
-  # laserkraft-wp-user-pass:
+  # ${CONTAINER_NAME}-wp-user-pass:
   #   external: true
   # Development
-  mysql-root-pass:
-    file: /var/data/client-data/wordpress/testsite.com/data/secrets/mysql_root_password.txt
-  wp-user:
-    file: /var/data/client-data/wordpress/testsite.com/data/secrets/wordpress_user.txt
-  wp-user-pass:
-    file: /var/data/client-data/wordpress/testsite.com/data/secrets/wordpress-user-pass.txt
+  ${CONTAINER_NAME}-mysql-root-pass:
+    file: ./data/secrets/mysql_root_password.txt
+  ${CONTAINER_NAME}-wp-user:
+    file: ./data/secrets/wordpress_user.txt
+  ${CONTAINER_NAME}-wp-user-pass:
+    file: ./data/secrets/wordpress-user-pass.txt
 
 networks:
-  public:
+  ${TRAEFIK_NETWORK}:
     external: true
   internal:
     driver: overlay

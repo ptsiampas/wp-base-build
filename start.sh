@@ -15,4 +15,4 @@ mkdir -p "$WP_DIR"
 [ $(stat -c '%u' "$MYSQL_DIR") -ne $MYSQL_USER ] || [ $(stat -c '%g' "$MYSQL_DIR") -ne $MYSQL_GROUP ] && sudo chown "$MYSQL_USER":"$MYSQL_GROUP" "$MYSQL_DIR"
 [ $(stat -c '%u' "$WP_DIR") -ne "$WP_USER" ] || [ $(stat -c '%g' "$WP_DIR") -ne "$WP_GROUP" ] && sudo chown "$WP_USER":"$WP_GROUP" "$WP_DIR"
 
-env $(cat env | grep ^[A-Z] | xargs) docker stack deploy --with-registry-auth -c docker-compose.yml "wp-${CLIENT_NAME}"
+env $(cat env | grep ^[A-Z] | xargs) docker stack deploy --with-registry-auth -c docker-compose.yml "wp-${CONTAINER_NAME}"
