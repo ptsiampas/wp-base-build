@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+# TODO: Finish this script so that it can install standard plugins.
 #
 
 function exec-wp() {
