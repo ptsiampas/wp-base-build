@@ -4,10 +4,6 @@ services:
   nginx:
     image: nginx:latest
     env_file: ./env
-    # configs:
-    #   - source: site.template
-    #     target: /etc/nginx/conf.d/site.template
-    #     mode: 0440
     volumes:
     - ./site.template:/etc/nginx/conf.d/site.template:ro
     - ./data/wp:/var/www/html:rw
@@ -70,17 +66,14 @@ services:
   mysql:
     image: mysql:5.7.21
     secrets:
-      - mysql-root-pass
-      - wp-user
-      - wp-user-pass
+      - ${CONTAINER_NAME}-mysql-root-pass
+      - ${CONTAINER_NAME}-wp-user
+      - ${CONTAINER_NAME}-wp-user-pass
     environment:
       - MYSQL_DATABASE=wordpress
       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/${CONTAINER_NAME}-mysql-root-pass
       - MYSQL_USER_FILE=/run/secrets/${CONTAINER_NAME}-wp-user
       - MYSQL_PASSWORD_FILE=/run/secrets/${CONTAINER_NAME}wp-user-pass
-      # - MYSQL_ROOT_PASSWORD=1234
-      # - MYSQL_USER=test
-      # - MYSQL_PASSWORD=1234
       - afinity:container!=wordpress
     labels:
       traefik.enable: "false"
@@ -98,29 +91,9 @@ services:
         delay: 5s
         max_attempts: 3
 
-secrets:
-  # Production
-  # ${CONTAINER_NAME}-msql-root:
-  #   external: true
-  # ${CONTAINER_NAME}-wp-user:
-  #   external: true
-  # ${CONTAINER_NAME}-wp-user-pass:
-  #   external: true
-  # Development
-  ${CONTAINER_NAME}-mysql-root-pass:
-    file: ./data/secrets/mysql_root_password.txt
-  ${CONTAINER_NAME}-wp-user:
-    file: ./data/secrets/wordpress_user.txt
-  ${CONTAINER_NAME}-wp-user-pass:
-    file: ./data/secrets/wordpress-user-pass.txt
-
 networks:
   ${TRAEFIK_NETWORK}:
     external: true
   internal:
     driver: overlay
     attachable: true
-
-# configs:
-#   site.template:
-#     external: true

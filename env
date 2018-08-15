@@ -1,8 +1,0 @@
-### PROJECT SETTINGS
-
-CONTAINER_NAME=testsite
-TRAEFIK_NETWORK=public
-NGINX_HOST=testsite.com
-NGINX_PORT=80
-
-
