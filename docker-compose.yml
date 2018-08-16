@@ -15,7 +15,7 @@ services:
       - memcached
       - wordpress
     networks:
-      public:
+      ${TRAEFIK_NETWORK}:
       internal:
     deploy:
       labels:
