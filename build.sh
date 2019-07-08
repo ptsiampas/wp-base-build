@@ -64,7 +64,7 @@ cat >> "${FULL_DIR}/${CONTAINER_NAME}.yml" << EOL
 
 secrets:
   # Production
-  ${CONTAINER_NAME}-msql-root:
+  ${CONTAINER_NAME}-mysql-root-pass:
     external: true
   ${CONTAINER_NAME}-wp-user:
     external: true
