@@ -43,9 +43,8 @@ services:
     build:
       context: builds/php7-fpm
     secrets:
-      - source: ${CONTAINER_NAME}-mysql-root-pass
-      - source: ${CONTAINER_NAME}-wp-user
-      - source: ${CONTAINER_NAME}-wp-user-pass
+      - ${CONTAINER_NAME}-wp-user
+      - ${CONTAINER_NAME}-wp-user-pass
 
     depends_on:
       - mysql
