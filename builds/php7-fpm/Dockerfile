@@ -1,4 +1,4 @@
-FROM wordpress:4.9.8-php7.1-fpm
+FROM wordpress:5.2.2-php7.1-fpm
 
 LABEL maintainer='Peter Tsiampas <peter@tsiampas.com>'
 

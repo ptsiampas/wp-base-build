@@ -39,7 +39,7 @@ services:
       internal:
 
   wordpress:
-    image: ptsiampas/dexs-wp:4.9.8-php7.1-fpm
+    image: ptsiampas/dexs-wp:5.2.2-php7.1-fpm
     build:
       context: builds/php7-fpm
     secrets:
