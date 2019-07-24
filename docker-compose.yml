@@ -49,7 +49,7 @@ services:
     depends_on:
       - mysql
     environment:
-      - MYSQL_DATABASE=wordpress
+      - WORDPRESS_DB_NAME=wordpress
       - WORDPRESS_DB_HOST=mysql
       - WORDPRESS_DB_USER_FILE=/run/secrets/${CONTAINER_NAME}-wp-user
       - WORDPRESS_DB_PASSWORD_FILE=/run/secrets/${CONTAINER_NAME}-wp-user-pass
