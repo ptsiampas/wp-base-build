@@ -1,0 +1,42 @@
+version: "3.3"
+services:
+  mysql:
+    image: mysql:5.7.21
+    secrets:
+      - ${CONTAINER_NAME}-mysql-root-pass
+      - ${CONTAINER_NAME}-wp-user
+      - ${CONTAINER_NAME}-wp-user-pass
+    environment:
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/${CONTAINER_NAME}-mysql-root-pass
+      - MYSQL_USER_FILE=/run/secrets/${CONTAINER_NAME}-wp-user
+      - MYSQL_PASSWORD_FILE=/run/secrets/${CONTAINER_NAME}wp-user-pass
+      - afinity:container!=wordpress
+    labels:
+      traefik.enable: "false"
+    networks:
+      internal:
+    volumes:
+      - ./data/db:/var/lib/mysql:rw
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == swarm-node-01
+networks:
+  internal:
+
+secrets:
+  ${CONTAINER_NAME}-mysql-root-pass
+    external: true
+  ${CONTAINER_NAME}-wp-user
+    external: true
+  ${CONTAINER_NAME}-wp-user-pass
+    external: true

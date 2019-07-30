@@ -2,7 +2,7 @@
 usage() { echo "Usage: $0 [-w] [-p] -d <domain.name>" 1>&2; exit 1; }
 ENVIRONMENT="DEV"
 SET_WWW=0
-DEST_DIR=/home/petert/Downloads
+DEST_DIR="$HOME/Downloads"
 FILE_LIST="config-items.sh exec-wp.sh fix-wordpress-permissions.sh start.sh stop.sh site_nginx.conf site.template data tools"
 
 while getopts "wpd:" o; do
@@ -41,9 +41,10 @@ if [ "${SET_WWW}" -eq 1 ]; then
     DOMAIN="www.${DOMAIN}"
 fi
 
-echo "environment = ${ENVIRONMENT}"
-echo "domain = ${DOMAIN}"
-echo "traefik network = ${TRAEFIK_NETWORK}"
+echo -e "Environment:\t\t${ENVIRONMENT}"
+echo -e "Domain:\t\t\t${DOMAIN}"
+echo -e "Traefik network:\t${TRAEFIK_NETWORK}"
+echo -e "Destination Directory:\t${DEST_DIR}"
 
 mkdir -p "$FULL_DIR"
 
@@ -57,6 +58,10 @@ done
 # Generate the yaml file for swarm to deploy
 export CONTAINER_NAME=$CONTAINER_NAME
 export TRAEFIK_NETWORK=$TRAEFIK_NETWORK
+# Create the init_db if its a prod enviornment
+if [ "${ENVIRONMENT}" == "PROD" ]; then
+  envsubst '${CONTAINER_NAME},${TRAEFIK_NETWORK}'  < init-db-compose.yml > "${FULL_DIR}/init-db-${CONTAINER_NAME}.yml"
+fi
 envsubst '${CONTAINER_NAME},${TRAEFIK_NETWORK}'  < docker-compose.yml > "${FULL_DIR}/${CONTAINER_NAME}.yml"
 
 if [ "${ENVIRONMENT}" == "PROD" ]; then
@@ -87,10 +92,7 @@ secrets:
 EOL
 fi
 
-
-
-
-
+# Create env file for use
 cat > "${FULL_DIR}/env" << EOL
 TRAEFIK_NETWORK=${TRAEFIK_NETWORK}
 CONTAINER_NAME=${CONTAINER_NAME}
