@@ -89,6 +89,14 @@ services:
         delay: 5s
         max_attempts: 3
 
+  cron:
+    image: ptsiampas/crond:latest
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      internal:
+
+
 networks:
   ${TRAEFIK_NETWORK}:
     external: true
