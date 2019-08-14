@@ -39,9 +39,7 @@ services:
       internal:
 
   wordpress:
-    image: ptsiampas/dexs-wp:5.2.2-php7.1-fpm
-    build:
-      context: builds/php7-fpm
+    image: ptsiampas/dexs-wp:5.2.2-php7.2-fpm
     secrets:
       - ${CONTAINER_NAME}-wp-user
       - ${CONTAINER_NAME}-wp-user-pass

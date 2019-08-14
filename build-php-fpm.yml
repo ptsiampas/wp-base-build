@@ -1,0 +1,8 @@
+version: "3.2"
+
+services:
+
+  wordpress:
+    image: ptsiampas/dexs-wp:5.2.2-php7.2-fpm
+    build:
+      context: builds/php7-fpm
