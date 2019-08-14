@@ -5,7 +5,7 @@ upstream memcached-servers {
 server {
     listen   ${NGINX_PORT}; ## listen for ipv4; this line is default and implied
     listen   [::]:${NGINX_PORT} default ipv6only=on; ## listen for ipv6
-    server_name ${NGINX_HOST};
+    server_name ${NGINX_HOST} www.${NGINX_HOST};
 
     keepalive_timeout  5 5;
     proxy_buffering    off;
